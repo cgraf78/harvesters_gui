@@ -35,6 +35,7 @@ from genicam.genapi import EInterfaceType, EAccessMode, EVisibility
 
 # Local application/library specific imports
 from harvesters_gui._private.frontend.pyqt5.helper import get_system_font
+from harvesters_gui._private.frontend.pyqt5.big_int_spinbox import BigIntSpinBox
 
 
 class TreeItem(object):
@@ -335,7 +336,7 @@ class FeatureEditDelegate(QStyledItemDelegate):
         interface_type = feature.node.principal_interface_type
 
         if interface_type == EInterfaceType.intfIInteger:
-            w = QSpinBox(parent)
+            w = BigIntSpinBox(parent)
             w.setRange(feature.min, feature.max)
             w.setSingleStep(feature.inc)
             w.setValue(feature.value)
