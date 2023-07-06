@@ -32,20 +32,26 @@ class BigIntSpinBox(QAbstractSpinBox):
         self._singleStep = 1
         self._minimum = -18446744073709551616
         self._maximum = 18446744073709551615
+        self._numericBase = 10
 
         self.lineEdit = QLineEdit(self)
         self.setLineEdit(self.lineEdit)
 
     def value(self):
         try:
-            return int(self.lineEdit.text())
+            return int(self.lineEdit.text(), self._numericBase)
         except:
             raise
             return 0
 
     def setValue(self, value):
         if self._valueInRange(value):
-            strValue = str(value)
+            if self._numericBase == 10:
+                strValue = str(value)
+            elif self._numericBase == 16:
+                strValue = hex(value)
+            else:
+                assert(False)
             self.lineEdit.setText(strValue)
 
     def stepBy(self, steps):
@@ -79,6 +85,11 @@ class BigIntSpinBox(QAbstractSpinBox):
     def setRange(self, minimum, maximum):
         self.setMinimum(minimum)
         self.setMaximum(maximum)
+
+    def setNumericBase(self, numericBase):
+        if numericBase != 10 and numericBase != 16:
+            raise ValueError("NumericBase must be either 10 or 16")
+        self._numericBase = numericBase
 
     def _valueInRange(self, value):
         if value >= self.minimum() and value <= self.maximum():

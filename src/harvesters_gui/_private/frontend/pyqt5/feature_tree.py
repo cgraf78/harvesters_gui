@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import QApplication, QTreeView, \
     QSpinBox, QPushButton, QComboBox, QWidget, \
     QLineEdit
 
-from genicam.genapi import NodeMap
+from genicam.genapi import NodeMap, ERepresentation
 from genicam.genapi import EInterfaceType, EAccessMode, EVisibility
 
 # Local application/library specific imports
@@ -112,7 +112,8 @@ class TreeItem(object):
                             value = '[Not readable]'
                         else:
                             try:
-                                value = str(feature.value)
+                                isHex = feature.representation == ERepresentation.HexNumber
+                                value = str(feature.value) if not isHex else hex(feature.value)
                             except AttributeError:
                                 try:
                                     value = feature.to_string()
@@ -340,6 +341,7 @@ class FeatureEditDelegate(QStyledItemDelegate):
             w.setRange(feature.min, feature.max)
             w.setSingleStep(feature.inc)
             w.setValue(feature.value)
+            w.setNumericBase(16 if feature.representation == ERepresentation.HexNumber else 10)
         elif interface_type == EInterfaceType.intfICommand:
             w = QPushButton(parent)
             w.setText('Execute')
@@ -379,7 +381,8 @@ class FeatureEditDelegate(QStyledItemDelegate):
         interface_type = feature.node.principal_interface_type
 
         if interface_type == EInterfaceType.intfIInteger:
-            editor.setValue(int(value))
+            base = 16 if feature.representation == ERepresentation.HexNumber else 10
+            editor.setValue(int(value, base))
         elif interface_type == EInterfaceType.intfIBoolean:
             i = editor.findText(value, Qt.MatchFixedString)
             editor.setCurrentIndex(i)
